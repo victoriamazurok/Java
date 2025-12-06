@@ -1,113 +1,105 @@
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class BasicDataOperationUsingMap {
     private final Hedgehog KEY_TO_SEARCH_AND_DELETE = new Hedgehog("Чіп", "дратівливий");
     private final String VALUE_TO_SEARCH_AND_DELETE = "Тетяна";
-    private final Hedgehog KEY_TO_ADD = new Hedgehog("Стріла", "цікавий");
     private final String VALUE_TO_ADD = "Юрій";
+    
+    private Map<Hedgehog, String> hedgehogMap;
 
-    private Map<Hedgehog, String> map;
-
-    public BasicDataOperationUsingMap(Map<Hedgehog, String> map) {
-        this.map = map;
+    public BasicDataOperationUsingMap(Map<Hedgehog, String> hedgehogMap) {
+        this.hedgehogMap = hedgehogMap;
     }
 
     public void executeDataOperations() {
-        // Пошук за ключем
-        System.out.println("========= Пошук за ключем =========");
         findByKeyInMap();
-        
-        // Пошук за значенням (пошук у всіх парах)
-        System.out.println("========= Пошук за значенням =========");
         findByValueInMap();
-        
-        // Виведення до сортування
-        System.out.println("========= Виведення колекції до сортування =========");
         printMap();
-
-        // Сортування за ключами
-        System.out.println("========= Сортування за ключами =========");
-        sortByKeyInMap();
+        sortMap();
         printMap();
-
-        // Додавання пари ключ/значення
-        System.out.println("========= Додавання пари ключ/значення =========");
         addEntryToMap();
-
-        // Видалення за ключем
-        System.out.println("========= Видалення за ключем =========");
         removeByKeyFromMap();
-
-        // Видалення за значенням
-        System.out.println("========= Видалення за значенням =========");
         removeByValueFromMap();
     }
 
-    // Пошук за ключем
-    private void findByKeyInMap() {
-        if (map.containsKey(KEY_TO_SEARCH_AND_DELETE)) {
-            System.out.println("Знайдено пару: " + KEY_TO_SEARCH_AND_DELETE + " -> " + map.get(KEY_TO_SEARCH_AND_DELETE));
+    void findByKeyInMap() {
+        long timeStart = System.nanoTime();
+        boolean found = hedgehogMap.containsKey(KEY_TO_SEARCH_AND_DELETE);
+        PerformanceTracker.displayOperationTime(timeStart, "пошук за ключем в Map");
+        if (found) {
+            String value = hedgehogMap.get(KEY_TO_SEARCH_AND_DELETE);
+            System.out.println("Елемент з ключем '" + KEY_TO_SEARCH_AND_DELETE + "' знайдено. Власник: " + value);
         } else {
-            System.out.println("Пару з ключем " + KEY_TO_SEARCH_AND_DELETE + " не знайдено.");
+            System.out.println("Елемент з ключем '" + KEY_TO_SEARCH_AND_DELETE + "' відсутній в Map.");
         }
     }
 
-    // Пошук за значенням
-    private void findByValueInMap() {
-        for (Map.Entry<Hedgehog, String> entry : map.entrySet()) {
-            if (entry.getValue().equals(VALUE_TO_SEARCH_AND_DELETE)) {
-                System.out.println("Знайдено пару: " + entry.getKey() + " -> " + entry.getValue());
-            }
+    void findByValueInMap() {
+        long timeStart = System.nanoTime();
+        boolean found = hedgehogMap.containsValue(VALUE_TO_SEARCH_AND_DELETE);
+        PerformanceTracker.displayOperationTime(timeStart, "пошук за значенням в Map");
+        if (found) {
+            System.out.println("Власника '" + VALUE_TO_SEARCH_AND_DELETE + "' знайдено.");
+        } else {
+            System.out.println("Власник '" + VALUE_TO_SEARCH_AND_DELETE + "' відсутній в Map.");
         }
     }
 
-    // Виведення колекції
-    private void printMap() {
-        System.out.println("=== Вміст колекції ===");
-        for (Map.Entry<Hedgehog, String> entry : map.entrySet()) {
-            System.out.println(entry.getKey() + " -> " + entry.getValue());
-        }
+    void printMap() {
+        System.out.println("=== Виведення Map ===");
+        hedgehogMap.entrySet().forEach(entry ->
+            System.out.println(entry.getKey() + " -> " + entry.getValue())
+        );
     }
 
-    // Сортування за ключами
-    private void sortByKeyInMap() {
-        Map<Hedgehog, String> sortedMap = new TreeMap<>(map);
-        map = sortedMap;
+    void sortMap() {
+        long timeStart = System.nanoTime();
+        hedgehogMap = hedgehogMap.entrySet().stream()
+                                .sorted(Map.Entry.comparingByKey())
+                                .collect(Collectors.toMap(
+                                        Map.Entry::getKey,
+                                        Map.Entry::getValue,
+                                        (e1, e2) -> e1,
+                                        LinkedHashMap::new
+                                ));
+        PerformanceTracker.displayOperationTime(timeStart, "сортування Map за ключами");
     }
 
-    // Додавання пари ключ/значення
-    private void addEntryToMap() {
-        map.put(KEY_TO_ADD, VALUE_TO_ADD);
-        System.out.println("Додано нову пару: " + KEY_TO_ADD + " -> " + VALUE_TO_ADD);
+    void addEntryToMap() {
+        long timeStart = System.nanoTime();
+        hedgehogMap.put(new Hedgehog("Стріла", "цікавий"), VALUE_TO_ADD);
+        PerformanceTracker.displayOperationTime(timeStart, "додавання пари до Map");
+        System.out.println("Додано нову пару: " + "Hedgehog{nickname='Стріла', temperament='цікавий'} -> Юрій");
     }
 
-    // Видалення за ключем
-    private void removeByKeyFromMap() {
-        map.remove(KEY_TO_SEARCH_AND_DELETE);
+    void removeByKeyFromMap() {
+        long timeStart = System.nanoTime();
+        hedgehogMap.remove(KEY_TO_SEARCH_AND_DELETE);
+        PerformanceTracker.displayOperationTime(timeStart, "видалення за ключем з Map");
         System.out.println("Видалено пару з ключем: " + KEY_TO_SEARCH_AND_DELETE);
     }
 
-    // Видалення за значенням
-    private void removeByValueFromMap() {
-        map.entrySet().removeIf(entry -> entry.getValue().equals(VALUE_TO_SEARCH_AND_DELETE));
+    void removeByValueFromMap() {
+        long timeStart = System.nanoTime();
+        List<Hedgehog> keysToRemove = hedgehogMap.entrySet().stream()
+                                                 .filter(entry -> entry.getValue() != null && entry.getValue().equals(VALUE_TO_SEARCH_AND_DELETE))
+                                                 .map(Map.Entry::getKey)
+                                                 .collect(Collectors.toList());
+        keysToRemove.forEach(hedgehogMap::remove);
+        PerformanceTracker.displayOperationTime(timeStart, "видалення за значенням з Map");
         System.out.println("Видалено пари з значенням: " + VALUE_TO_SEARCH_AND_DELETE);
     }
 
-    // Основний метод для запуску
     public static void main(String[] args) {
-        Map<Hedgehog, String> map = new HashMap<>();
-        map.put(new Hedgehog("Шипик", "активний"), "Людмила");
-        map.put(new Hedgehog("Чіп", "дратівливий"), "Мирослав");
-        map.put(new Hedgehog("Колючка", "лагідний"), "Орест");
-        map.put(new Hedgehog("Гострий", "спокійний"), "Тетяна");
-        map.put(new Hedgehog("Чіп", "грайливий"), "Злата");
-        map.put(new Hedgehog("Бодя", "активний"), "Володимир");
-        map.put(new Hedgehog("Айстра", "цікавий"), "Лариса");
-        map.put(new Hedgehog("Гострий", "спокійний"), "Тетяна");
-        map.put(new Hedgehog("Нічник", "лагідний"), "Лариса");
-        map.put(new Hedgehog("Піксель", "грайливий"), "Христина");
+        Map<Hedgehog, String> hedgehogMap = new HashMap<>();
+        hedgehogMap.put(new Hedgehog("Шипик", "активний"), "Лариса");
+        hedgehogMap.put(new Hedgehog("Чіп", "дратівливий"), "Мирослав");
+        hedgehogMap.put(new Hedgehog("Колючка", "лагідний"), "Орест");
+        hedgehogMap.put(new Hedgehog("Гострий", "спокійний"), "Тетяна");
+        hedgehogMap.put(new Hedgehog("Чіп", "грайливий"), "Злата");
 
-        BasicDataOperationUsingMap operations = new BasicDataOperationUsingMap(map);
+        BasicDataOperationUsingMap operations = new BasicDataOperationUsingMap(hedgehogMap);
         operations.executeDataOperations();
     }
 }

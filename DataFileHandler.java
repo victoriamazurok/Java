@@ -1,56 +1,52 @@
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
+import java.io.*;
+import java.util.*;
+import java.util.stream.Collectors;
 
-/**
- * Клас DataFileHandler управляє роботою з файлами даних byte.
- */
 public class DataFileHandler {
-    /**
-     * Завантажує масив об'єктів Byte з файлу.
-     * 
-     * @param filePath Шлях до файлу з даними.
-     * @return Масив об'єктів Byte.
-     */
-    public static Byte[] loadArrayFromFile(String filePath) {
-        Byte[] temporaryArray = new Byte[1000];
-        int currentIndex = 0;
 
+    @SuppressWarnings("unchecked")
+    public static <T> T[] loadArrayFromFile(String filePath, Class<T> clazz) {
         try (BufferedReader fileReader = new BufferedReader(new FileReader(filePath))) {
-            String currentLine;
-            while ((currentLine = fileReader.readLine()) != null) {
-                currentLine = currentLine.trim().replaceAll("^\\uFEFF", "");
-                if (!currentLine.isEmpty()) {
-                    Byte parsedByte = Byte.parseByte(currentLine);
-                    temporaryArray[currentIndex++] = parsedByte;
-                }
-            }
-        } catch (IOException ioException) {
-            ioException.printStackTrace();
+            return fileReader.lines()
+                    .map(line -> line.replaceAll("^\\uFEFF", ""))  // Remove BOM if present
+                    .map(String::trim)
+                    .filter(line -> !line.isEmpty())
+                    .map(line -> convertToType(line, clazz))
+                    .toArray(size -> (T[]) java.lang.reflect.Array.newInstance(clazz, size));
+        } catch (IOException e) {
+            throw new RuntimeException("Помилка читання з файлу: " + filePath, e);
         }
-
-        Byte[] resultArray = new Byte[currentIndex];
-        System.arraycopy(temporaryArray, 0, resultArray, 0, currentIndex);
-
-        return resultArray;
     }
 
-    /**
-     * Зберігає масив об'єктів Byte у файл.
-     * 
-     * @param byteArray Масив об'єктів Byte.
-     * @param filePath Шлях до файлу для збереження.
-     */
-    public static void writeArrayToFile(Byte[] byteArray, String filePath) {
-        try (BufferedWriter fileWriter = new BufferedWriter(new FileWriter(filePath))) {
-            for (Byte byteElement : byteArray) {
-                fileWriter.write(byteElement.toString());
-                fileWriter.newLine();
+    private static <T> T convertToType(String line, Class<T> clazz) {
+        if (clazz == Byte.class) {
+            try {
+                byte parsedValue = Byte.parseByte(line);
+                return clazz.cast(parsedValue);
+            } catch (NumberFormatException e) {
+                throw new IllegalArgumentException("Невірний формат числа для типу byte: " + line);
             }
-        } catch (IOException ioException) {
-            ioException.printStackTrace();
+        } else if (clazz == Integer.class) {
+            try {
+                return clazz.cast(Integer.parseInt(line));
+            } catch (NumberFormatException e) {
+                throw new IllegalArgumentException("Невірний формат числа для типу int: " + line);
+            }
+        } else if (clazz == String.class) {
+            return clazz.cast(line);
+        }
+        // Для інших типів можна додати аналогічну перевірку
+        throw new UnsupportedOperationException("Тип не підтримується: " + clazz.getSimpleName());
+    }
+
+    public static <T> void writeArrayToFile(T[] array, String filePath) {
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(filePath))) {
+            String content = Arrays.stream(array)
+                    .map(String::valueOf) // adjust this for different types
+                    .collect(Collectors.joining(System.lineSeparator()));
+            writer.write(content);
+        } catch (IOException e) {
+            throw new RuntimeException("Помилка запису в файл: " + filePath, e);
         }
     }
 }

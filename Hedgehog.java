@@ -19,21 +19,14 @@ public class Hedgehog implements Comparable<Hedgehog> {
 
     @Override
     public int compareTo(Hedgehog other) {
-        // Сортуємо спочатку за кличкою (за зменшенням), потім за темпераментом (за зростанням)
-        int nicknameComparison = other.nickname.compareTo(this.nickname); // За зменшенням
-        if (nicknameComparison != 0) {
-            return nicknameComparison;
-        }
-        return this.temperament.compareTo(other.temperament); // За зростанням
+        int nicknameComparison = this.nickname.compareTo(other.nickname);
+        if (nicknameComparison != 0) return nicknameComparison;
+        return this.temperament.compareTo(other.temperament);
     }
 
     @Override
-    public boolean equals(Object obj) {
-        if (this == obj) return true;
-        if (obj == null || getClass() != obj.getClass()) return false;
-        Hedgehog hedgehog = (Hedgehog) obj;
-        return Objects.equals(nickname, hedgehog.nickname) &&
-               Objects.equals(temperament, hedgehog.temperament);
+    public String toString() {
+        return "Hedgehog{nickname='" + nickname + "', temperament='" + temperament + "'}";
     }
 
     @Override
@@ -42,7 +35,11 @@ public class Hedgehog implements Comparable<Hedgehog> {
     }
 
     @Override
-    public String toString() {
-        return "Hedgehog{nickname='" + nickname + "', temperament='" + temperament + "'}";
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Hedgehog hedgehog = (Hedgehog) o;
+        return Objects.equals(nickname, hedgehog.nickname) &&
+               Objects.equals(temperament, hedgehog.temperament);
     }
 }

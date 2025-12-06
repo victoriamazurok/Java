@@ -74,7 +74,7 @@ public class BasicDataOperation {
         
         // Підготовка даних та перевірка формату
         byteValueToSearch = Byte.parseByte(args[0]);
-        byteArray = DataFileHandler.loadArrayFromFile(PATH_TO_DATA_FILE);
+        byteArray = DataFileHandler.loadArrayFromFile(PATH_TO_DATA_FILE, Byte.class);
         
         runAllOperations();
 

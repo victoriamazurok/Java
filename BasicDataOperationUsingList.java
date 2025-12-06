@@ -1,28 +1,24 @@
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.ArrayList;
+import java.time.LocalDateTime;
+import java.util.*;
+import java.util.stream.Collectors;
 
-/**
- * Клас BasicDataOperationUsingList реалізує операції з колекціями типу ArrayList для даних byte.
- */
 public class BasicDataOperationUsingList {
     private Byte byteValueToSearch;
     private Byte[] byteArray;
     private List<Byte> byteList;
 
-    BasicDataOperationUsingList(Byte byteValueToSearch, Byte[] byteArray) {
+    public BasicDataOperationUsingList(Byte byteValueToSearch, Byte[] byteArray) {
         this.byteValueToSearch = byteValueToSearch;
         this.byteArray = byteArray;
         this.byteList = new ArrayList<>(Arrays.asList(byteArray));
     }
-    
+
     public void executeDataOperations() {
         findInList();
         locateMinMaxInList();
-        
+
         sortList();
-        
+
         findInList();
         locateMinMaxInList();
 
@@ -30,36 +26,42 @@ public class BasicDataOperationUsingList {
         locateMinMaxInArray();
 
         performArraySorting();
-        
+
         findInArray();
         locateMinMaxInArray();
 
         DataFileHandler.writeArrayToFile(byteArray, BasicDataOperation.PATH_TO_DATA_FILE + ".sorted");
     }
 
-    void performArraySorting() {
+    public void performArraySorting() {
         long timeStart = System.nanoTime();
 
-        Arrays.sort(byteArray);
+        byteArray = Arrays.stream(byteArray)
+                          .map(Byte::valueOf)  // Converts primitive byte to Byte object
+                          .sorted()
+                          .toArray(Byte[]::new);
 
         PerformanceTracker.displayOperationTime(timeStart, "упорядкування масиву byte");
     }
 
-    void findInArray() {
+    public void findInArray() {
         long timeStart = System.nanoTime();
 
-        int position = Arrays.binarySearch(this.byteArray, byteValueToSearch);
+        int position = Arrays.stream(byteArray)
+                             .map(Byte::valueOf)  // Converts primitive byte to Byte object
+                             .collect(Collectors.toList())
+                             .indexOf(byteValueToSearch);
 
-        PerformanceTracker.displayOperationTime(timeStart, "пошук елемента в масивi byte");
+        PerformanceTracker.displayOperationTime(timeStart, "пошук елемента в масиві byte");
 
         if (position >= 0) {
-            System.out.println("Елемент '" + byteValueToSearch + "' знайдено в масивi за позицією: " + position);
+            System.out.println("Елемент '" + byteValueToSearch + "' знайдено в масиві за позицією: " + position);
         } else {
             System.out.println("Елемент '" + byteValueToSearch + "' відсутній в масиві.");
         }
     }
 
-    void locateMinMaxInArray() {
+    public void locateMinMaxInArray() {
         if (byteArray == null || byteArray.length == 0) {
             System.out.println("Масив є пустим або не ініціалізованим.");
             return;
@@ -67,48 +69,56 @@ public class BasicDataOperationUsingList {
 
         long timeStart = System.nanoTime();
 
-        Byte minValue = byteArray[0];
-        Byte maxValue = byteArray[0];
+        Byte minValue = Arrays.stream(byteArray)
+                              .map(Byte::valueOf)  // Converts primitive byte to Byte object
+                              .min(Byte::compareTo)
+                              .orElse(null);
 
-        for (Byte currentByte : byteArray) {
-            if (currentByte < minValue) {
-                minValue = currentByte;
-            }
-            if (currentByte > maxValue) {
-                maxValue = currentByte;
-            }
-        }
+        Byte maxValue = Arrays.stream(byteArray)
+                              .map(Byte::valueOf)  // Converts primitive byte to Byte object
+                              .max(Byte::compareTo)
+                              .orElse(null);
 
-        PerformanceTracker.displayOperationTime(timeStart, "визначення мiнiмальної i максимальної дати в масивi byte");
+        PerformanceTracker.displayOperationTime(timeStart, "визначення мiнiмальної i максимальної дати в масиві byte");
 
-        System.out.println("Найменше значення в масиви: " + minValue);
-        System.out.println("Найбільше значення в масиви: " + maxValue);
+        System.out.println("Найменше значення в масиві: " + minValue);
+        System.out.println("Найбільше значення в масиві: " + maxValue);
     }
 
-    void findInList() {
+    public void findInList() {
         long timeStart = System.nanoTime();
 
-        int position = Collections.binarySearch(this.byteList, byteValueToSearch);
+        int position = byteList.stream()
+                               .map(Byte::valueOf)  // Converts primitive byte to Byte object
+                               .collect(Collectors.toList())
+                               .indexOf(byteValueToSearch);
 
         PerformanceTracker.displayOperationTime(timeStart, "пошук елемента в List byte");
 
         if (position >= 0) {
-            System.out.println("Елемент '" + byteValueToSearch + "' знайдено в List за позицією: " + position);
+            System.out.println("Елемент '" + byteValueToSearch + "' знайдено в ArrayList за позицією: " + position);
         } else {
-            System.out.println("Елемент '" + byteValueToSearch + "' відсутній в List.");
+            System.out.println("Елемент '" + byteValueToSearch + "' відсутній в ArrayList.");
         }
     }
 
-    void locateMinMaxInList() {
+    public void locateMinMaxInList() {
         if (byteList == null || byteList.isEmpty()) {
-            System.out.println("Колекція List є пустою або не ініціалізованою.");
+            System.out.println("Колекція ArrayList є пустою або не ініціалізованою.");
             return;
         }
 
         long timeStart = System.nanoTime();
 
-        Byte minValue = Collections.min(byteList);
-        Byte maxValue = Collections.max(byteList);
+        Byte minValue = byteList.stream()
+                               .map(Byte::valueOf)  // Converts primitive byte to Byte object
+                               .min(Byte::compareTo)
+                               .orElse(null);
+
+        Byte maxValue = byteList.stream()
+                               .map(Byte::valueOf)  // Converts primitive byte to Byte object
+                               .max(Byte::compareTo)
+                               .orElse(null);
 
         PerformanceTracker.displayOperationTime(timeStart, "визначення мiнiмальної i максимальної дати в List byte");
 
@@ -116,11 +126,14 @@ public class BasicDataOperationUsingList {
         System.out.println("Найбільше значення в List: " + maxValue);
     }
 
-    void sortList() {
+    public void sortList() {
         long timeStart = System.nanoTime();
 
-        Collections.sort(byteList);
+        byteList = byteList.stream()
+                           .map(Byte::valueOf)  // Converts primitive byte to Byte object
+                           .sorted()
+                           .collect(Collectors.toList());
 
-        PerformanceTracker.displayOperationTime(timeStart, "упорядкування List byte");
+        PerformanceTracker.displayOperationTime(timeStart, "упорядкування ArrayList byte");
     }
 }
