@@ -7,6 +7,11 @@ public class BasicDataOperationUsingMap {
     private final String VALUE_TO_ADD = "Юрій";
     
     private static final String SEPARATOR = "\n" + "=".repeat(80) + "\n";
+    
+    // Компаратор для сортування: кличка за зменшенням, темперамент за зростанням
+    private static final Comparator<Hedgehog> HEDGEHOG_COMPARATOR = 
+        Comparator.comparing(Hedgehog::nickname, Comparator.reverseOrder())
+                  .thenComparing(Hedgehog::temperament);
 
     public void executeDataOperations() {
         System.out.println(SEPARATOR);
@@ -16,7 +21,7 @@ public class BasicDataOperationUsingMap {
         processMapType("HashMap", new HashMap<>());
         System.out.println("\n" + "~".repeat(80) + "\n");
         
-        processMapType("TreeMap", new TreeMap<>());
+        processMapType("TreeMap", new TreeMap<>(HEDGEHOG_COMPARATOR));
         
         System.out.println(SEPARATOR);
         System.out.println("✅ АНАЛІЗ ЗАВЕРШЕНО");
@@ -93,11 +98,7 @@ public class BasicDataOperationUsingMap {
     void sortMap(Map<Hedgehog, String> map) {
         long timeStart = System.nanoTime();
         Map<Hedgehog, String> sortedMap = map.entrySet().stream()
-                .sorted((e1, e2) -> {
-                    int nickCompare = e2.getKey().getNickname().compareTo(e1.getKey().getNickname());
-                    if (nickCompare != 0) return nickCompare;
-                    return e1.getKey().getTemperament().compareTo(e2.getKey().getTemperament());
-                })
+                .sorted((e1, e2) -> HEDGEHOG_COMPARATOR.compare(e1.getKey(), e2.getKey()))
                 .collect(Collectors.toMap(
                         Map.Entry::getKey,
                         Map.Entry::getValue,
