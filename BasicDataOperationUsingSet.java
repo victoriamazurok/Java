@@ -36,7 +36,9 @@ public class BasicDataOperationUsingSet {
     void performArraySorting() {
         long timeStart = System.nanoTime();
 
-        Arrays.sort(byteArray);
+        byteArray = Arrays.stream(byteArray)
+                          .sorted()
+                          .toArray(Byte[]::new);
 
         PerformanceTracker.displayOperationTime(timeStart, "упорядкування масиву byte");
     }
@@ -63,17 +65,8 @@ public class BasicDataOperationUsingSet {
 
         long timeStart = System.nanoTime();
 
-        Byte minValue = byteArray[0];
-        Byte maxValue = byteArray[0];
-
-        for (Byte currentByte : byteArray) {
-            if (currentByte < minValue) {
-                minValue = currentByte;
-            }
-            if (currentByte > maxValue) {
-                maxValue = currentByte;
-            }
-        }
+        Byte minValue = Arrays.stream(byteArray).min(Byte::compareTo).orElse(null);
+        Byte maxValue = Arrays.stream(byteArray).max(Byte::compareTo).orElse(null);
 
         PerformanceTracker.displayOperationTime(timeStart, "визначення мiнiмальної i максимальної дати в масиві byte");
 
@@ -84,7 +77,9 @@ public class BasicDataOperationUsingSet {
     void findInSet() {
         long timeStart = System.nanoTime();
 
-        boolean elementExists = this.byteSet.contains(byteValueToSearch);
+        // Використовуємо стріми для перевірки наявності
+        boolean elementExists = this.byteSet.stream()
+                                         .anyMatch(b -> b.equals(byteValueToSearch));
 
         PerformanceTracker.displayOperationTime(timeStart, "пошук елемента в HashSet byte");
 
@@ -103,8 +98,8 @@ public class BasicDataOperationUsingSet {
 
         long timeStart = System.nanoTime();
 
-        Byte minValue = Collections.min(byteSet);
-        Byte maxValue = Collections.max(byteSet);
+        Byte minValue = byteSet.stream().min(Byte::compareTo).orElse(null);
+        Byte maxValue = byteSet.stream().max(Byte::compareTo).orElse(null);
 
         PerformanceTracker.displayOperationTime(timeStart, "визначення мiнiмальної i максимальної дати в HashSet byte");
 
@@ -116,13 +111,9 @@ public class BasicDataOperationUsingSet {
         System.out.println("Кількість елементів в масиві: " + byteArray.length);
         System.out.println("Кількість елементів в HashSet: " + byteSet.size());
 
-        boolean allElementsPresent = true;
-        for (Byte byteElement : byteArray) {
-            if (!byteSet.contains(byteElement)) {
-                allElementsPresent = false;
-                break;
-            }
-        }
+        // Функціональний підхід: перевіряємо, чи всі елементи масиву є в множині
+        boolean allElementsPresent = Arrays.stream(byteArray)
+                                           .allMatch(byteSet::contains);
 
         if (allElementsPresent) {
             System.out.println("Всі елементи масиву наявні в HashSet.");

@@ -84,7 +84,9 @@ public class BasicDataOperationUsingQueue {
     private void findInQueue() {
         long timeStart = System.nanoTime();
 
-        boolean elementExists = this.byteQueue.contains(byteValueToSearch);
+        // Функціональний підхід: шукаємо через стрім
+        boolean elementExists = this.byteQueue.stream()
+                                         .anyMatch(b -> b.equals(byteValueToSearch));
 
         PerformanceTracker.displayOperationTime(timeStart, "пошук елемента в Queue byte");
 
@@ -103,8 +105,8 @@ public class BasicDataOperationUsingQueue {
 
         long timeStart = System.nanoTime();
 
-        Byte minValue = Collections.min(byteQueue);
-        Byte maxValue = Collections.max(byteQueue);
+        Byte minValue = byteQueue.stream().min(Byte::compareTo).orElse(null);
+        Byte maxValue = byteQueue.stream().max(Byte::compareTo).orElse(null);
 
         PerformanceTracker.displayOperationTime(timeStart, "визначення мiнiмальної i максимальної дати в Queue byte");
 

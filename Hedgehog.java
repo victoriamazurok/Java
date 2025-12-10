@@ -19,7 +19,8 @@ public class Hedgehog implements Comparable<Hedgehog> {
 
     @Override
     public int compareTo(Hedgehog other) {
-        int nicknameComparison = this.nickname.compareTo(other.nickname);
+        // Сортування за кличкою за зменшенням (desc), при рівності — темперамент за зростанням
+        int nicknameComparison = other.nickname.compareTo(this.nickname);
         if (nicknameComparison != 0) return nicknameComparison;
         return this.temperament.compareTo(other.temperament);
     }
