@@ -15,32 +15,46 @@ public class BasicDataOperationUsingMap {
     public void executeDataOperations() {
         // Пошук за ключем
         System.out.println("========= Пошук за ключем =========");
+        long startTime = System.nanoTime();
         findByKeyInMap();
+        PerformanceTracker.displayOperationTime(startTime, "Пошук за ключем");
         
         // Пошук за значенням (пошук у всіх парах)
         System.out.println("========= Пошук за значенням =========");
+        startTime = System.nanoTime();
         findByValueInMap();
+        PerformanceTracker.displayOperationTime(startTime, "Пошук за значенням");
         
         // Виведення до сортування
         System.out.println("========= Виведення колекції до сортування =========");
+        startTime = System.nanoTime();
         printMap();
+        PerformanceTracker.displayOperationTime(startTime, "Виведення колекції");
 
         // Сортування за ключами
         System.out.println("========= Сортування за ключами =========");
+        startTime = System.nanoTime();
         sortByKeyInMap();
+        PerformanceTracker.displayOperationTime(startTime, "Сортування за ключами");
         printMap();
 
         // Додавання пари ключ/значення
         System.out.println("========= Додавання пари ключ/значення =========");
+        startTime = System.nanoTime();
         addEntryToMap();
+        PerformanceTracker.displayOperationTime(startTime, "Додавання пари ключ/значення");
 
         // Видалення за ключем
         System.out.println("========= Видалення за ключем =========");
+        startTime = System.nanoTime();
         removeByKeyFromMap();
+        PerformanceTracker.displayOperationTime(startTime, "Видалення за ключем");
 
         // Видалення за значенням
         System.out.println("========= Видалення за значенням =========");
+        startTime = System.nanoTime();
         removeByValueFromMap();
+        PerformanceTracker.displayOperationTime(startTime, "Видалення за значенням");
     }
 
     // Пошук за ключем
